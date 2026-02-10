@@ -1,32 +1,25 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>What is Missing? - TCare</title>
-    <link rel="stylesheet" href="game4styles.css">
+    <link rel="stylesheet" href="game4styles.css" />
 </head>
 
-
 <body>
-
-    
 <div class="app">
     <header class="header">
         <div>
             <h1>What is Missing?</h1>
-            <p class="subtitle">Study the scene, then identify what disappeared.</p>
-
+            <p class="subtitle">Study the scene carefully, then spot what disappeared.</p>
         </div>
 
         <div class="hud">
-
-            <div class="hud-item"><span class="label">Round</span><span id="round">1</span></div>
+            <div class="hud-item"><span class="label">Round</span><span id="round">—</span></div>
             <div class="hud-item"><span class="label">Items</span><span id="items">6</span></div>
             <div class="hud-item"><span class="label">Score</span><span id="score">0</span></div>
             <div class="hud-item"><span class="label">Streak</span><span id="streak">0</span></div>
-
-
         </div>
     </header>
 
@@ -34,66 +27,43 @@
         <label>
             Total Rounds
             <select id="totalRounds">
-
                 <option value="5">5 Rounds</option>
                 <option value="10" selected>10 Rounds</option>
                 <option value="15">15 Rounds</option>
             </select>
-
-
         </label>
 
         <label>
             Memorize Time (seconds)
             <input id="memorizeSeconds" type="number" min="3" max="15" step="1" value="8" />
-
         </label>
 
         <button id="startBtn">Start</button>
         <button id="resetBtn" class="secondary">Reset</button>
         <button id="endGameBtn" class="secondary" disabled>End Game</button>
-        <button id="exportBtn" class="secondary" disabled>
-            Download Report
-        </button>
-
-        <button id="homeBtn" class="secondary" onclick="location.href='homeuser.html'">
-            Home
-        </button>
-
+        <button id="exportBtn" class="secondary" disabled>Download Report</button>
+        <button class="secondary" onclick="location.href='homeuser.html'">Home</button>
     </section>
 
     <main class="game-area">
-
-        <div class="phase-indicator" id="phase">Ready to test your visual memory?</div>
-        <div class="scene-container" id="scene"></div>
+        <div class="phase-indicator" id="phase">Choose settings, then press Start.</div>
+        <div class="scene-wrap" id="scene"></div>
         <div class="feedback" id="feedback"></div>
-
     </main>
 
     <footer class="footer">
-
-
-        <div id="status" class="status">Choose settings, then press Start.</div>
+        <div id="status" class="status">Difficulty adapts — gets harder when you're right, easier when you're wrong.</div>
     </footer>
 </div>
 
 <script type="module">
-
     import { auth } from "./firebase.js";
-
-    import { onAuthStateChanged } from
-      "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-  
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        window.location.href = "login.html";
-      }
+        if (!user) window.location.href = "login.html";
     });
-
 </script>
 
-
 <script src="game4.js"></script>
-
 </body>
 </html>
