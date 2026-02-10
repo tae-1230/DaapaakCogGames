@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flow Free - TCare</title>
+
+  <!-- SAME STYLE AS game4 -->
+  <link rel="stylesheet" href="game4styles.css" />
+</head>
+
+<body>
+<div class="app">
+
+  <!-- ===== HEADER ===== -->
+  <header class="header">
+    <div>
+      <h1>Flow Free</h1>
+      <p class="subtitle">Connect matching colors without crossing paths.</p>
+    </div>
+
+    <div class="hud">
+      <div class="hud-item">
+        <span class="label">Grid</span>
+        <span id="hudGrid">6×6</span>
+      </div>
+      <div class="hud-item">
+        <span class="label">Pairs</span>
+        <span id="hudPairs">5</span>
+      </div>
+      <div class="hud-item">
+        <span class="label">Moves</span>
+        <span id="hudMoves">0</span>
+      </div>
+      <div class="hud-item">
+        <span class="label">Time</span>
+        <span id="hudTime">0.0s</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== CONTROLS ===== -->
+  <section class="controls">
+    <label>
+      Grid Size
+      <select id="gridSize">
+        <option value="5">5 × 5</option>
+        <option value="6" selected>6 × 6</option>
+        <option value="7">7 × 7</option>
+        <option value="8">8 × 8</option>
+        <option value="9">9 × 9</option>
+      </select>
+    </label>
+
+    <label>
+      Pairs
+      <select id="pairCount"></select>
+    </label>
+
+    <button id="resetBtn">Reset</button>
+    <button id="downloadBtn" class="secondary" disabled>Download Report</button>
+    <button class="secondary" onclick="location.href='homeuser.html'">Home</button>
+  </section>
+
+  <!-- ===== GAME AREA ===== -->
+  <main class="game-area">
+    <canvas id="game"></canvas>
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div id="status" class="status">
+      Connect all matching colors to complete the puzzle.
+    </div>
+  </footer>
+
+</div>
+
+<!-- ===== AUTH GUARD (same as game4) ===== -->
+<script type="module">
+  import { auth } from "./firebase.js";
+  import { onAuthStateChanged } from
+    "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+  onAuthStateChanged(auth, (user) => {
+    if (!user) window.location.href = "login.html";
+  });
+</script>
+
+<!-- ===== GAME LOGIC ===== -->
+<script type="module">
+import { saveGameSession } from "./stats.js";
+
+/* ================= CONFIG ================= */
+let GRID_SIZE = 6;
+let PAIRS = 5;
+const CELL = 80;
+
+const COLORS = [
+  "#ff5252", "#40c4ff", "#69f0ae",
+  "#ffd740", "#e040fb", "#ffab40",
+  "#00e5ff", "#ff6d00", "#8bc34a",
+  "#32a852", "#00f9e8", "#ff1744"
+];
+
+/* ================= CANVAS ================= */
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+/* ================= STATE ================= */
+let solutionGrid = [];
+let dots = [];
+let paths = {};
+let drawing = null;
+let solved = false;
+let startTime = 0;
+let moves = 0;
+let timerId = null;
+
+/* ================= HUD ================= */
+function updateHUD() {
+  document.getElementById("hudGrid").textContent = `${GRID_SIZE}×${GRID_SIZE}`;
+  document.getElementById("hudPairs").textContent = PAIRS;
+  document.getElementById("hudMoves").textContent = moves;
+}
+
+/* ================= HELPERS ================= */
+const inside = (x, y) => x >= 0 && y >= 0 && x < GRID_SIZE && y < GRID_SIZE;
+const neighbors = (a, b) =>
+  Math.abs(a.x - b.x) + Math.abs(a.y - b.y) === 1;
+
+function cellFromMouse(e) {
+  return {
+    x: Math.floor(e.offsetX / CELL),
+    y: Math.floor(e.offsetY / CELL)
+  };
+}
+
+/* ================= LEVEL ================= */
+function generateLevel() {
+  canvas.width = GRID_SIZE * CELL;
+  canvas.height = GRID_SIZE * CELL;
+
+  solutionGrid = Array.from({ length: GRID_SIZE }, () =>
+    Array(GRID_SIZE).fill(null)
+  );
+
+  dots = [];
+  paths = {};
+  drawing = null;
+  solved = false;
+  moves = 0;
+  startTime = Date.now();
+
+  updateHUD();
+  document.getElementById("downloadBtn").disabled = true;
+  document.getElementById("status").textContent =
+    "Connect all matching colors to complete the puzzle.";
+
+  for (let id = 0; id < PAIRS; id++) {
+    let path;
+    do { path = generatePath(); } while (!path);
+
+    for (const c of path) solutionGrid[c.y][c.x] = id;
+    dots.push({ ...path[0], id });
+    dots.push({ ...path[path.length - 1], id });
+  }
+}
+
+function generatePath() {
+  const start = randomEmptyCell();
+  if (!start) return null;
+
+  const path = [start];
+  const length = 4 + Math.floor(Math.random() * 4);
+
+  while (path.length < length) {
+    const last = path[path.length - 1];
+    const options = [
+      { x: last.x + 1, y: last.y },
+      { x: last.x - 1, y: last.y },
+      { x: last.x, y: last.y + 1 },
+      { x: last.x, y: last.y - 1 }
+    ].filter(c =>
+      inside(c.x, c.y) &&
+      solutionGrid[c.y][c.x] === null &&
+      !path.some(p => p.x === c.x && p.y === c.y)
+    );
+
+    if (!options.length) break;
+    path.push(options[Math.floor(Math.random() * options.length)]);
+  }
+
+  return path.length >= 3 ? path : null;
+}
+
+function randomEmptyCell() {
+  const cells = [];
+  for (let y = 0; y < GRID_SIZE; y++) {
+    for (let x = 0; x < GRID_SIZE; x++) {
+      if (solutionGrid[y][x] === null) cells.push({ x, y });
+    }
+  }
+  return cells.length ? cells[Math.floor(Math.random() * cells.length)] : null;
+}
+
+/* ================= DRAW ================= */
+function drawGrid() {
+  ctx.strokeStyle = "#333";
+  for (let i = 0; i <= GRID_SIZE; i++) {
+    ctx.beginPath();
+    ctx.moveTo(i * CELL, 0);
+    ctx.lineTo(i * CELL, canvas.height);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(0, i * CELL);
+    ctx.lineTo(canvas.width, i * CELL);
+    ctx.stroke();
+  }
+}
+
+function drawPath(cells, color) {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = CELL / 3;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(cells[0].x * CELL + CELL / 2, cells[0].y * CELL + CELL / 2);
+  for (const c of cells.slice(1)) {
+    ctx.lineTo(c.x * CELL + CELL / 2, c.y * CELL + CELL / 2);
+  }
+  ctx.stroke();
+}
+
+function drawDots() {
+  for (const d of dots) {
+    ctx.fillStyle = COLORS[d.id];
+    ctx.beginPath();
+    ctx.arc(
+      d.x * CELL + CELL / 2,
+      d.y * CELL + CELL / 2,
+      CELL / 4,
+      0,
+      Math.PI * 2
+    );
+    ctx.fill();
+  }
+}
+
+function drawWin() {
+  ctx.fillStyle = "rgba(0,0,0,0.6)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#00e676";
+  ctx.font = "bold 48px sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("PUZZLE SOLVED!", canvas.width / 2, canvas.height / 2);
+}
+
+/* ================= INPUT ================= */
+canvas.addEventListener("mousedown", e => {
+  if (solved) return;
+  moves++;
+  updateHUD();
+
+  const { x, y } = cellFromMouse(e);
+  if (!inside(x, y)) return;
+
+  const dot = dots.find(d => d.x === x && d.y === y);
+  if (!dot) return;
+
+  if (paths[dot.id]) delete paths[dot.id];
+  drawing = { id: dot.id, cells: [{ x, y }] };
+});
+
+canvas.addEventListener("mousemove", e => {
+  if (!drawing || solved) return;
+
+  const { x, y } = cellFromMouse(e);
+  if (!inside(x, y)) return;
+
+  const last = drawing.cells[drawing.cells.length - 1];
+  if (!neighbors(last, { x, y })) return;
+
+  if (drawing.cells.some(c => c.x === x && c.y === y)) return;
+
+  for (const pid in paths) {
+    if (paths[pid].some(c => c.x === x && c.y === y)) return;
+  }
+
+  drawing.cells.push({ x, y });
+
+  const endDot = dots.find(
+    d => d.id === drawing.id &&
+         d.x === x && d.y === y &&
+         !(d.x === drawing.cells[0].x && d.y === drawing.cells[0].y)
+  );
+
+  if (endDot) {
+    paths[drawing.id] = drawing.cells;
+    drawing = null;
+    checkWin();
+  }
+});
+
+canvas.addEventListener("mouseup", () => drawing = null);
+
+/* ================= WIN ================= */
+function checkWin() {
+  for (let id = 0; id < PAIRS; id++) {
+    if (!paths[id]) return;
+  }
+
+  solved = true;
+  document.getElementById("downloadBtn").disabled = false;
+
+  const timeSec = (Date.now() - startTime) / 1000;
+
+  saveGameSession("flow_free", {
+    game: "flow_free",
+    metrics: {
+      grid_size: GRID_SIZE,
+      pairs: PAIRS,
+      moves,
+      completion_time_s: timeSec
+    },
+    timestamp_iso: new Date().toISOString()
+  });
+
+  document.getElementById("status").textContent =
+    `Completed in ${timeSec.toFixed(1)}s with ${moves} moves.`;
+}
+
+/* ================= CONTROLS ================= */
+document.getElementById("resetBtn").onclick = generateLevel;
+
+document.getElementById("gridSize").onchange = e => {
+  GRID_SIZE = parseInt(e.target.value);
+  populatePairs();
+  generateLevel();
+};
+
+function populatePairs() {
+  const maxPairs = Math.floor((GRID_SIZE * GRID_SIZE) / 6);
+  const select = document.getElementById("pairCount");
+  select.innerHTML = "";
+
+  for (let i = 2; i <= maxPairs; i++) {
+    const opt = document.createElement("option");
+    opt.value = i;
+    opt.textContent = i;
+    if (i === PAIRS) opt.selected = true;
+    select.appendChild(opt);
+  }
+
+  if (PAIRS > maxPairs) PAIRS = maxPairs;
+}
+
+document.getElementById("pairCount").onchange = e => {
+  PAIRS = parseInt(e.target.value);
+  generateLevel();
+};
+
+/* ================= LOOP ================= */
+function loop() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawGrid();
+
+  for (const id in paths) drawPath(paths[id], COLORS[id]);
+  if (drawing) drawPath(drawing.cells, COLORS[drawing.id]);
+
+  drawDots();
+  if (solved) drawWin();
+
+  requestAnimationFrame(loop);
+}
+
+/* ================= START ================= */
+populatePairs();
+generateLevel();
+loop();
+</script>
+
+</body>
+</html>

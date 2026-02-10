@@ -1,3 +1,6 @@
+import { saveGameSession } from "./stats.js";
+
+
 let board = [];
 let solution = [];
 let fixedCells = [];
@@ -261,6 +264,15 @@ function showVictoryModal() {
         `${minutes}:${seconds.toString().padStart(2, '0')}`;
     document.getElementById('final-errors').textContent = errors;
     document.getElementById('victory-modal').classList.remove('hidden');
+
+    saveGameSession("sudoku", {
+        game: "sudoku",
+        timestamp_iso: new Date().toISOString(),
+        metrics: {
+            time_s: elapsedTime / 1000,
+            errors: errors
+        }
+    });
 }
 
 function closeModal() {

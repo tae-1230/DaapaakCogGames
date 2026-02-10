@@ -1,5 +1,5 @@
 // What is Missing?, Aneesh
-
+import { saveGameSession } from "./stats.js";
 
 const scene = document.getElementById("scene");
 const startBtn = document.getElementById("startBtn");
@@ -38,6 +38,7 @@ let nextRoundTimer = null;
 // session tracking
 let session = null;
 let liveSession = null;
+
 
 // scenes
 const sceneTemplates = [
@@ -490,6 +491,8 @@ function finishGame() {
     liveSession.metrics = computeMetrics(liveSession);
     session = liveSession;
     liveSession = null;
+
+    saveGameSession("whats_missing", session);
   }
 
   const acc = session?.metrics?.accuracy != null

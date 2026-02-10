@@ -1,426 +1,268 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TCare - User Statistics</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TCare – User Statistics</title>
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-        .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            padding: 40px;
-            max-width: 900px;
-            width: 100%;
-        }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #e0e0e0;
-        }
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 900px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,.3);
+    }
 
-        .header-left {
-            flex: 1;
-        }
+    h1 { font-size: 2.5em; color: #333; }
+    .tagline { color: #666; margin-bottom: 20px; }
 
-        h1 {
-            color: #333;
-            font-size: 2.5em;
-            margin-bottom: 5px;
-        }
+    .back-btn {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      float: right;
+    }
 
-        .tagline {
-            color: #666;
-            font-size: 1.1em;
-        }
+    .user-info {
+      background: #f0f4ff;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+    }
 
-        .back-btn {
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 1em;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.3s;
-            text-decoration: none;
-            display: inline-block;
-        }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 20px;
+      margin-bottom: 30px;
+    }
 
-        .back-btn:hover {
-            background: #5568d3;
-            transform: translateY(-2px);
-        }
+    .stat-card {
+      background: linear-gradient(135deg,#667eea,#764ba2);
+      color: white;
+      padding: 25px;
+      border-radius: 15px;
+      text-align: center;
+    }
 
-        .user-info {
-            background: #f0f4ff;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-        }
+    .stat-value { font-size: 3em; font-weight: bold; }
 
-        .user-info h2 {
-            color: #667eea;
-            font-size: 1.5em;
-            margin-bottom: 10px;
-        }
+    .section-title {
+      font-size: 1.8em;
+      margin: 30px 0 20px;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 10px;
+    }
 
-        .user-info p {
-            color: #555;
-            line-height: 1.6;
-        }
+    .game-stat-item {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+    }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
+    .game-metrics {
+      display: flex;
+      gap: 20px;
+    }
 
-        .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 25px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
-            transition: transform 0.3s;
-        }
+    .metric-value {
+      color: #667eea;
+      font-weight: bold;
+      font-size: 1.3em;
+      text-align: center;
+    }
 
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
+    .metric-label {
+      text-align: center;
+      font-size: .9em;
+      color: #666;
+    }
 
-        .stat-value {
-            font-size: 3em;
-            font-weight: bold;
-            margin-bottom: 10px;
-            display: block;
-        }
+    footer {
+      margin-top: 30px;
+      text-align: center;
+      color: #999;
+      font-size: .9em;
+    }
+  </style>
 
-        .stat-label {
-            font-size: 1em;
-            opacity: 0.9;
-        }
+  <!-- AUTH GUARD -->
+  <script type="module">
+    import { auth } from "./firebase.js";
+    import { onAuthStateChanged } from
+      "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        .games-section {
-            margin-bottom: 30px;
-        }
-
-        .section-title {
-            color: #333;
-            font-size: 1.8em;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #e0e0e0;
-        }
-
-        .game-stats {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .game-stat-item {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: background-color 0.3s;
-        }
-
-        .game-stat-item:hover {
-            background: #e9ecef;
-        }
-
-        .game-name {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.2em;
-            color: #333;
-            font-weight: 600;
-        }
-
-        .game-icon {
-            font-size: 1.5em;
-        }
-
-        .game-metrics {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .metric {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .metric-value {
-            font-size: 1.3em;
-            font-weight: bold;
-            color: #667eea;
-        }
-
-        .metric-label {
-            font-size: 0.9em;
-            color: #666;
-        }
-
-        .no-data {
-            text-align: center;
-            padding: 40px;
-            color: #999;
-            font-size: 1.1em;
-        }
-
-        .footer {
-            text-align: center;
-            color: #999;
-            font-size: 0.9em;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #e0e0e0;
-        }
-
-        .version {
-            color: #aaa;
-            font-size: 0.8em;
-            margin-top: 10px;
-        }
-
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2em;
-            }
-
-            .container {
-                padding: 25px;
-            }
-
-            .header {
-                flex-direction: column;
-                gap: 15px;
-                text-align: center;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .game-stat-item {
-                flex-direction: column;
-                gap: 15px;
-                text-align: center;
-            }
-
-            .game-metrics {
-                justify-content: center;
-            }
-        }
-    </style>
-    <script type="module">
-        import { auth } from "./firebase.js";
-        import { onAuthStateChanged } from
-          "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-      
-        onAuthStateChanged(auth, (user) => {
-          if (!user) {
-            window.location.href = "login.html";
-          } else {
-            // Display user email
-            const userEmail = document.getElementById('userEmail');
-            if (userEmail) {
-              userEmail.textContent = user.email || 'User';
-            }
-          }
-        });
-    </script>
+    onAuthStateChanged(auth, user => {
+      if (!user) window.location.href = "login.html";
+      else document.getElementById("userEmail").textContent = user.email;
+    });
+  </script>
 </head>
 
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="header-left">
-                <h1>📊 Your Statistics</h1>
-                <p class="tagline">Track your cognitive performance</p>
-            </div>
-            <button class="back-btn" onclick="location.href='homeuser.html'">
-                ← Back to Home
-            </button>
-        </div>
+<div class="container">
 
-        <div class="user-info">
-            <h2>👤 Welcome!</h2>
-            <p>Email: <span id="userEmail">Loading...</span></p>
-            <p>Here you can track your progress across all cognitive games. Keep playing to improve your scores!</p>
-        </div>
+  <button class="back-btn" onclick="location.href='homeuser.html'">← Back</button>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <span class="stat-value" id="totalGames">0</span>
-                <span class="stat-label">Games Played</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-value" id="avgScore">0</span>
-                <span class="stat-label">Average Score</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-value" id="bestStreak">0</span>
-                <span class="stat-label">Best Streak</span>
-            </div>
-        </div>
+  <h1>📊 Your Statistics</h1>
+  <p class="tagline">Track your cognitive performance</p>
 
-        <div class="games-section">
-            <h2 class="section-title">Game Performance</h2>
-            <div class="game-stats">
-                <div class="game-stat-item">
-                    <div class="game-name">
-                        <span class="game-icon">👓</span>
-                        <span>Recall Trail</span>
-                    </div>
-                    <div class="game-metrics">
-                        <div class="metric">
-                            <span class="metric-value" id="recall-played">0</span>
-                            <span class="metric-label">Played</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-value" id="recall-avg">-</span>
-                            <span class="metric-label">Avg Time</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-value" id="recall-best">-</span>
-                            <span class="metric-label">Best</span>
-                        </div>
-                    </div>
-                </div>
+  <div class="user-info">
+    <p>Email: <strong id="userEmail">Loading…</strong></p>
+  </div>
 
-                <div class="game-stat-item">
-                    <div class="game-name">
-                        <span class="game-icon">🧩</span>
-                        <span>Connect the Dots</span>
-                    </div>
-                    <div class="game-metrics">
-                        <div class="metric">
-                            <span class="metric-value" id="dots-played">0</span>
-                            <span class="metric-label">Played</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-value" id="dots-avg">-</span>
-                            <span class="metric-label">Avg Score</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-value" id="dots-best">-</span>
-                            <span class="metric-label">Best</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="game-stat-item">
-                    <div class="game-name">
-                        <span class="game-icon">⚡</span>
-                        <span>Reaction Time Test</span>
-                    </div>
-                    <div class="game-metrics">
-                        <div class="metric">
-                            <span class="metric-value" id="reaction-played">0</span>
-                            <span class="metric-label">Played</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-value" id="reaction-avg">-</span>
-                            <span class="metric-label">Avg Time</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-value" id="reaction-best">-</span>
-                            <span class="metric-label">Best</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="game-stat-item">
-                    <div class="game-name">
-                        <span class="game-icon">🧠</span>
-                        <span>What is missing?</span>
-                    </div>
-                    <div class="game-metrics">
-                        <div class="metric">
-                            <span class="metric-value" id="missing-played">0</span>
-                            <span class="metric-label">Played</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-value" id="missing-avg">-</span>
-                            <span class="metric-label">Avg Score</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-value" id="missing-best">-</span>
-                            <span class="metric-label">Best</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="game-stat-item">
-                    <div class="game-name">
-                        <span class="game-icon">🔢</span>
-                        <span>Sudoku</span>
-                    </div>
-                    <div class="game-metrics">
-                        <div class="metric">
-                            <span class="metric-value" id="sudoku-played">0</span>
-                            <span class="metric-label">Played</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-value" id="sudoku-completed">0</span>
-                            <span class="metric-label">Completed</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-value" id="sudoku-best">-</span>
-                            <span class="metric-label">Best Time</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="footer">
-            <p>
-                Developed by: Dantuluri, A. • Kang, P. • Kang, A. • Nguyen, K. • Rao, D. • Soman, A. • Tsai, A.
-            </p>
-            <p class="version">Version 0.1 - Initial Release</p>
-        </div>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-value" id="totalGames">0</div>
+      Games Played
     </div>
+    <div class="stat-card">
+      <div class="stat-value" id="avgScore">0</div>
+      Average Score
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="bestStreak">0</div>
+      Best Streak
+    </div>
+  </div>
 
-    <script>
-        // This script will be used to fetch and display actual statistics
-        // For now, it shows placeholder data
-        document.addEventListener('DOMContentLoaded', () => {
-            // TODO: Fetch real statistics from Firebase/database
-            // For now, showing zeros as placeholder
-            console.log('Stats page loaded. Ready to display user statistics.');
-        });
-    </script>
+  <h2 class="section-title">Game Performance</h2>
+  <div id="games"></div>
+
+  <footer>
+    Developed by Dantuluri, A. • Kang, P. • Kang, A. • Nguyen, K. • Rao, D. • Soman, A. • Tsai, A.
+    <div>Version 0.1</div>
+  </footer>
+
+</div>
+
+<!-- ================= STATS LOGIC ================= -->
+<script type="module">
+import { auth, db } from "./firebase.js";
+import { collection, getDocs } from
+  "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+/* ===== GAMES CONFIG ===== */
+const GAMES = [
+  {
+    name: "Recall Trail",
+    key: "trail_making_popup_recall",
+    metric: s => s.metrics?.completion_time_s,
+    unit: "s"
+  },
+  {
+    name: "Reaction Time Test",
+    key: "visual_reaction_time",
+    metric: s => s.metrics?.mean_rt_ms,
+    unit: "ms"
+  },
+  {
+    name: "What is Missing?",
+    key: "whats_missing",
+    metric: s => s.final_score,
+    unit: ""
+  },
+  {
+    name: "Sudoku",
+    key: "sudoku",
+    metric: s => s.time_seconds,
+    unit: "s"
+  },
+  {
+    name: "Flow Free",
+    key: "flow_free",
+    metric: s => s.metrics?.completion_time_s,
+    unit: "s"
+  }
+];
+
+/* ===== HELPERS ===== */
+async function loadGame(uid, gameKey) {
+  const snap = await getDocs(
+    collection(db, "users", uid, "games", gameKey, "sessions")
+  );
+  return snap.docs.map(d => d.data());
+}
+
+/* ===== MAIN ===== */
+async function loadStats(uid) {
+  let totalGames = 0;
+  let streak = 0;
+  let scorePool = [];
+
+  const container = document.getElementById("games");
+  container.innerHTML = "";
+
+  for (const game of GAMES) {
+    const sessions = await loadGame(uid, game.key);
+
+    totalGames += sessions.length;
+    streak = Math.max(streak, sessions.length);
+
+    const values = sessions.map(game.metric).filter(Number);
+    if (game.unit === "") scorePool.push(...values);
+
+    container.innerHTML += `
+      <div class="game-stat-item">
+        <strong>${game.name}</strong>
+        <div class="game-metrics">
+          <div>
+            <div class="metric-value">${sessions.length}</div>
+            <div class="metric-label">Played</div>
+          </div>
+          <div>
+            <div class="metric-value">${
+              values.length
+                ? (values.reduce((a,b)=>a+b,0) / values.length).toFixed(1) + game.unit
+                : "-"
+            }</div>
+            <div class="metric-label">Average</div>
+          </div>
+          <div>
+            <div class="metric-value">${
+              values.length ? Math.min(...values) + game.unit : "-"
+            }</div>
+            <div class="metric-label">Best</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  document.getElementById("totalGames").textContent = totalGames;
+  document.getElementById("bestStreak").textContent = streak;
+
+  document.getElementById("avgScore").textContent =
+    scorePool.length
+      ? Math.round(scorePool.reduce((a,b)=>a+b,0) / scorePool.length)
+      : 0;
+}
+
+/* ===== AUTH ===== */
+auth.onAuthStateChanged(user => {
+  if (user) loadStats(user.uid);
+});
+</script>
+
 </body>
 </html>

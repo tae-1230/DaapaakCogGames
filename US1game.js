@@ -2,6 +2,8 @@
 // memorize sequence in a popup, then click circles in order
 // exports a simple report (json + csv) from one button
 
+import { saveGameSession } from "./stats.js";
+
 const board = document.getElementById("board");
 const startBtn = document.getElementById("startBtn");
 const resetBtn = document.getElementById("resetBtn");
@@ -35,6 +37,8 @@ let countdownTimer = null;
 // report/session stuff
 let session = null;     // last finished session
 let liveSession = null; // current running session
+
+
 
 // ----- small helpers -----
 function setStatus(msg) {
@@ -368,6 +372,8 @@ function finishGame() {
   liveSession.metrics = computeMetrics(liveSession);
   session = liveSession;
   liveSession = null;
+  saveGameSession("trail_making_popup_recall", session);
+
 
   setStatus(
     `Completed! Time: ${timeSec.toFixed(1)}s • Errors: ${errors}` +

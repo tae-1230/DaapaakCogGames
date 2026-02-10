@@ -2,6 +2,9 @@
 // Tests simple reaction time to visual stimuli
 // Exports detailed report (json + csv)
 
+import { saveGameSession } from "./stats.js";
+
+
 const board = document.getElementById("board");
 const startBtn = document.getElementById("startBtn");
 const resetBtn = document.getElementById("resetBtn");
@@ -318,6 +321,9 @@ function finishTest() {
   liveSession.metrics = computeMetrics(liveSession);
   session = liveSession;
   liveSession = null;
+
+  saveGameSession("visual_reaction_time", session);
+
 
   hideStimulus();
   board.classList.remove("waiting", "ready");
