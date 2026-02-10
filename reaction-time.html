@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Visual Reaction Time Test</title>
+    <link rel="stylesheet" href="reaction-time.css" />
+</head>
+
+<body>
+<div class="app">
+    <header class="header">
+        <div>
+            <h1>Visual Reaction Time Test</h1>
+            <p class="subtitle">Click as quickly as possible when the target appears.</p>
+        </div>
+
+        <div class="hud">
+            <div class="hud-item"><span class="label">Trial</span><span id="trial">0/0</span></div>
+            <div class="hud-item"><span class="label">Avg RT</span><span id="avgRT">—</span></div>
+        </div>
+    </header>
+
+    <section class="controls">
+        <label>
+            Number of Trials
+            <select id="numTrials">
+                <option value="5">5 trials</option>
+                <option value="10" selected>10 trials</option>
+                <option value="15">15 trials</option>
+                <option value="20">20 trials</option>
+            </select>
+        </label>
+
+        <label>
+            Stimulus Type
+            <select id="stimulusType">
+                <option value="circle">Circle</option>
+                <option value="square">Square</option>
+                <option value="color-flash">Color Flash</option>
+                <option value="word">Word "CLICK"</option>
+            </select>
+        </label>
+
+        <label>
+            Delay Range (ms)
+            <select id="delayRange">
+                <option value="1000-3000">1-3 seconds</option>
+                <option value="2000-4000" selected>2-4 seconds</option>
+                <option value="3000-6000">3-6 seconds</option>
+            </select>
+        </label>
+
+        <button id="startBtn">Start Test</button>
+        <button id="resetBtn" class="secondary">Reset</button>
+        <button id="exportBtn" class="secondary" disabled>
+            Download Report
+        </button>
+    </section>
+
+    <main class="board-wrap">
+        <div class="board" id="board">
+            <div id="instructionText" class="instruction-text">
+                Click <strong>Start Test</strong> to begin
+            </div>
+            <div id="stimulus" class="stimulus hidden"></div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div id="status" class="status">Configure your settings and press Start Test.</div>
+    </footer>
+</div>
+
+<!-- Results Modal -->
+<div id="resultsModal" class="modal hidden">
+    <div class="modal-card">
+        <h2>Test Complete!</h2>
+        
+        <div class="results-grid">
+            <div class="result-item">
+                <div class="result-label">Mean RT</div>
+                <div class="result-value" id="resultMean">—</div>
+            </div>
+            <div class="result-item">
+                <div class="result-label">Median RT</div>
+                <div class="result-value" id="resultMedian">—</div>
+            </div>
+            <div class="result-item">
+                <div class="result-label">Fastest</div>
+                <div class="result-value" id="resultFastest">—</div>
+            </div>
+            <div class="result-item">
+                <div class="result-label">Slowest</div>
+                <div class="result-value" id="resultSlowest">—</div>
+            </div>
+            <div class="result-item">
+                <div class="result-label">Std Dev</div>
+                <div class="result-value" id="resultStdDev">—</div>
+            </div>
+            <div class="result-item">
+                <div class="result-label">Early Clicks</div>
+                <div class="result-value" id="resultEarly">—</div>
+            </div>
+        </div>
+
+        <div id="trialsList" class="trials-list"></div>
+
+        <div class="modal-row">
+            <button id="closeModalBtn" class="secondary">Close</button>
+            <button id="exportFromModalBtn">Download Report</button>
+        </div>
+    </div>
+</div>
+
+<script src="reaction-time.js"></script>
+</body>
+</html>
