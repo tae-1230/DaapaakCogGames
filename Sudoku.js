@@ -1,6 +1,5 @@
 import { saveGameSession } from "./stats.js";
 
-
 let board = [];
 let solution = [];
 let fixedCells = [];

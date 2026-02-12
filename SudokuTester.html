@@ -4,13 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sudoku - Cognitive Training</title>
+    <!-- Style sheet for Sudoku -->
     <link rel="stylesheet" href="Sudoku.css">
 </head>
 <body>
+<!-- Main application wrapper -->
     <div class="app">
+        <!-- ================= HEADER ================= -->
         <div class="header">
             <div>
                 <h1>Sudoku</h1>
+                <!-- Short game instructions -->
                 <p class="subtitle">Fill the grid so each row, column, and 3x3 box contains 1-9.</p>
             </div>
             <div class="hud">
@@ -25,7 +29,9 @@
             </div>
         </div>
 
+    <!-- ================= CONTROLS ================= -->
         <div class="controls">
+            <!-- Difficulty selector -->
             <label>
                 Difficulty
                 <select id="difficulty">
@@ -34,11 +40,13 @@
                     <option value="hard">Hard (25 given numbers)</option>
                 </select>
             </label>
+            <!-- Start game button -->
             <button id="start-btn">Start</button>
             <button class="secondary" id="pause-btn" disabled>Pause</button>
+            <!-- Reset board button -->
             <button class="secondary" id="reset-btn">Reset</button>
         </div>
-
+        <!-- ================= GAME BOARD ================= -->
         <div class="board-wrap">
             <div class="sudoku-grid" id="sudoku-grid"></div>
             <div class="number-pad">
@@ -55,12 +63,13 @@
             </div>
         </div>
     </div>
-
+<!-- End Page -->
     <div class="modal hidden" id="victory-modal">
         <div class="modal-card">
             <h2> Puzzle Solved!</h2>
             <p>Congratulations! You've completed the Sudoku puzzle.</p>
             <div class="stats-grid">
+                <!-- Memorization time input -->
                 <div class="stat-box">
                     <div class="stat-value" id="final-time">0:00</div>
                     <div class="stat-label">Time Taken</div>
