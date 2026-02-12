@@ -2,15 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <!-- Ensures proper scaling on mobile devices -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TCare - Login</title>
+
     <style>
+        /* Reset default browser spacing */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        /* Page background styling */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -21,6 +25,7 @@
             padding: 20px;
         }
 
+        /* Main white login card */
         .container {
             background: white;
             border-radius: 20px;
@@ -30,27 +35,32 @@
             width: 100%;
         }
 
+        /* Header section */
         .header {
             text-align: center;
             margin-bottom: 30px;
         }
 
+        /* Main title */
         h1 {
             color: #333;
             font-size: 2.5em;
             margin-bottom: 10px;
         }
 
+        /* Subtitle under title */
         .tagline {
             color: #666;
             font-size: 1.1em;
             margin-bottom: 30px;
         }
 
+        /* Wrapper for each input field */
         .form-group {
             margin-bottom: 20px;
         }
 
+        /* Input labels */
         label {
             display: block;
             margin-bottom: 5px;
@@ -58,6 +68,7 @@
             font-weight: 500;
         }
 
+        /* Input field styling */
         input[type="text"],
         input[type="email"],
         input[type="password"] {
@@ -69,6 +80,7 @@
             transition: border-color 0.3s;
         }
 
+        /* Highlight input when focused */
         input[type="text"]:focus,
         input[type="email"]:focus,
         input[type="password"]:focus {
@@ -76,6 +88,7 @@
             border-color: #667eea;
         }
 
+        /* Login button styling */
         .btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -90,6 +103,7 @@
             margin-bottom: 10px;
         }
 
+        /* Button hover effect */
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
@@ -99,6 +113,7 @@
             transform: translateY(-1px);
         }
 
+        /* Sign up link section */
         .toggle {
             text-align: center;
             margin-top: 20px;
@@ -114,6 +129,7 @@
             text-decoration: underline;
         }
 
+        /* Footer styling */
         .footer {
             text-align: center;
             color: #999;
@@ -129,6 +145,7 @@
             margin-top: 10px;
         }
 
+        /* Responsive adjustments for small screens */
         @media (max-width: 600px) {
             .container {
                 padding: 25px;
@@ -141,29 +158,39 @@
     </style>
 </head>
 
-  
 <body>
     <div class="container">
+
+        <!-- App title and tagline -->
         <div class="header">
             <h1>TCare</h1>
             <p class="tagline">Cognitive Games to Keep Your Brain Active</p>
         </div>
 
+        <!-- Login form heading -->
         <h2 style="text-align: center; margin-bottom: 20px; color: #333;">Login</h2>
+
+        <!-- Email input -->
         <div class="form-group">
             <label for="email">Email</label>
             <input type="email" id="email" name="email" required>
         </div>
+
+        <!-- Password input -->
         <div class="form-group">
             <label for="password">Password</label>
             <input type="password" id="password" name="password" required>
         </div>
+
+        <!-- Login button -->
         <button class="btn" id="loginBtn">Login</button>
 
+        <!-- Sign up redirect -->
         <div class="toggle">
             <p>Don't have an account? <a href="signup.html">Sign Up</a>
         </div>
 
+        <!-- Developer credits -->
         <div class="footer">
             <p>
                 Developed by: Dantuluri, A. • Kang, P. • Kang, A. • Nguyen, K. • Rao, D. • Soman, A. • Tsai, A.
@@ -172,35 +199,44 @@
         </div>
     </div>
 
+    <!-- Firebase Authentication Script -->
     <script type="module">
         import { auth } from "./firebase.js";
         import {
           signInWithEmailAndPassword
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
       
+        // Get button and link elements
         const loginBtn = document.getElementById("loginBtn");
         const signupLink = document.getElementById("signupLink");
       
+        // Login button click handler
         loginBtn.addEventListener("click", async () => {
           const email = document.getElementById("email").value;
           const password = document.getElementById("password").value;
       
+          // Basic validation
           if (!email || !password) {
             alert("Please enter email and password");
             return;
           }
       
           try {
+            // Attempt Firebase sign-in
             await signInWithEmailAndPassword(auth, email, password);
+
+            // Redirect to home page after successful login
             window.location.href = "homeuser.html";
           } catch (error) {
+            // Show error message if login fails
             alert(error.message);
           }
         });
       
+        // Temporary signup link handler (if implemented later)
         signupLink.addEventListener("click", () => {
           alert("Sign up page coming soon 🙂");
         });
-      </script>
-    </body>
+    </script>
+</body>
 </html>
