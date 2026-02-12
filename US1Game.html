@@ -2,26 +2,54 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
+
+    <!-- Ensures proper scaling on mobile devices -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>Trail Making (Popup Recall)</title>
+
+    <!-- External stylesheet for this game -->
     <link rel="stylesheet" href="US1Gamestyles.css" />
 </head>
 
 <body>
+
+<!-- Main application wrapper -->
 <div class="app">
+
+    <!-- ================= HEADER ================= -->
     <header class="header">
         <div>
+            <!-- Game title -->
             <h1>Trail Making (Popup Recall)</h1>
-            <p class="subtitle">Memorize the order, then tap the circles in sequence.</p>
+
+            <!-- Short game instructions -->
+            <p class="subtitle">
+                Memorize the order, then tap the circles in sequence.
+            </p>
         </div>
 
+        <!-- Heads-Up Display (HUD) -->
         <div class="hud">
-            <div class="hud-item"><span class="label">Time</span><span id="time">0.0s</span></div>
-            <div class="hud-item"><span class="label">Errors</span><span id="errors">0</span></div>
+            <!-- Timer display -->
+            <div class="hud-item">
+                <span class="label">Time</span>
+                <span id="time">0.0s</span>
+            </div>
+
+            <!-- Error counter -->
+            <div class="hud-item">
+                <span class="label">Errors</span>
+                <span id="errors">0</span>
+            </div>
         </div>
     </header>
 
+
+    <!-- ================= CONTROLS ================= -->
     <section class="controls">
+
+        <!-- Difficulty selector -->
         <label>
             Difficulty
             <select id="difficulty">
@@ -31,41 +59,84 @@
             </select>
         </label>
 
+        <!-- Memorization time input -->
         <label>
             Memorize Time (seconds)
-            <input id="memorizeSeconds" type="number" min="1" max="10" step="1" value="4" />
+            <input
+                id="memorizeSeconds"
+                type="number"
+                min="1"
+                max="10"
+                step="1"
+                value="4"
+            />
         </label>
 
+        <!-- Start game button -->
         <button id="startBtn">Start</button>
+
+        <!-- Reset board button -->
         <button id="resetBtn" class="secondary">Reset</button>
+
+        <!-- Export results button (disabled until game ends) -->
         <button id="exportBtn" class="secondary" disabled>
             Download Report
         </button>
 
     </section>
 
+
+    <!-- ================= GAME BOARD ================= -->
     <main class="board-wrap">
+        <!-- Dynamic game board container -->
         <div class="board" id="board"></div>
     </main>
 
+
+    <!-- ================= STATUS FOOTER ================= -->
     <footer class="footer">
-        <div id="status" class="status">Choose settings, then press Start.</div>
+        <!-- Status message area -->
+        <div id="status" class="status">
+            Choose settings, then press Start.
+        </div>
     </footer>
+
 </div>
 
-<!-- Sequence Modal -->
+
+<!-- ================= SEQUENCE MODAL ================= -->
+<!-- Popup shown before gameplay to memorize order -->
 <div id="sequenceModal" class="modal hidden">
+
     <div class="modal-card">
+
+        <!-- Modal title -->
         <h2>Memorize the Order</h2>
+
+        <!-- Displays the sequence to memorize -->
         <div id="sequenceText" class="sequence-text">—</div>
 
+        <!-- Countdown + manual start row -->
         <div class="modal-row">
-            <span class="small">Starting in <span id="countdown">3</span>…</span>
-            <button id="startNowBtn" class="secondary">Start Now</button>
+
+            <!-- Countdown timer -->
+            <span class="small">
+                Starting in <span id="countdown">3</span>…
+            </span>
+
+            <!-- Skip countdown and start immediately -->
+            <button id="startNowBtn" class="secondary">
+                Start Now
+            </button>
+
         </div>
     </div>
 </div>
 
+
+<!-- ================= GAME LOGIC SCRIPT ================= -->
+<!-- Main JavaScript file controlling gameplay -->
 <script type="module" src="US1game.js"></script>
+
 </body>
 </html>
