@@ -2,12 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+
+  <!-- Ensures proper scaling on mobile devices -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>TCare – User Statistics</title>
 
   <style>
+    /* Reset default spacing */
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
+    /* Page background styling */
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -18,6 +23,7 @@
       padding: 20px;
     }
 
+    /* Main white card container */
     .container {
       background: white;
       border-radius: 20px;
@@ -27,9 +33,13 @@
       box-shadow: 0 20px 60px rgba(0,0,0,.3);
     }
 
+    /* Page heading */
     h1 { font-size: 2.5em; color: #333; }
+
+    /* Subtitle */
     .tagline { color: #666; margin-bottom: 20px; }
 
+    /* Back button */
     .back-btn {
       background: #667eea;
       color: white;
@@ -40,6 +50,7 @@
       float: right;
     }
 
+    /* User info box */
     .user-info {
       background: #f0f4ff;
       padding: 20px;
@@ -47,6 +58,7 @@
       margin-bottom: 30px;
     }
 
+    /* Top stats summary grid */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(3,1fr);
@@ -54,6 +66,7 @@
       margin-bottom: 30px;
     }
 
+    /* Individual summary stat card */
     .stat-card {
       background: linear-gradient(135deg,#667eea,#764ba2);
       color: white;
@@ -64,6 +77,7 @@
 
     .stat-value { font-size: 3em; font-weight: bold; }
 
+    /* Section title */
     .section-title {
       font-size: 1.8em;
       margin: 30px 0 20px;
@@ -71,6 +85,7 @@
       padding-bottom: 10px;
     }
 
+    /* Individual game stat item */
     .game-stat-item {
       background: #f8f9fa;
       padding: 20px;
@@ -80,11 +95,13 @@
       margin-bottom: 15px;
     }
 
+    /* Metrics container */
     .game-metrics {
       display: flex;
       gap: 20px;
     }
 
+    /* Metric value styling */
     .metric-value {
       color: #667eea;
       font-weight: bold;
@@ -92,12 +109,14 @@
       text-align: center;
     }
 
+    /* Metric label styling */
     .metric-label {
       text-align: center;
       font-size: .9em;
       color: #666;
     }
 
+    /* Footer */
     footer {
       margin-top: 30px;
       text-align: center;
@@ -106,15 +125,20 @@
     }
   </style>
 
-  <!-- AUTH GUARD -->
+  <!-- ================= AUTH GUARD ================= -->
+  <!-- Redirects to login if user is not authenticated -->
   <script type="module">
     import { auth } from "./firebase.js";
     import { onAuthStateChanged } from
       "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     onAuthStateChanged(auth, user => {
-      if (!user) window.location.href = "login.html";
-      else document.getElementById("userEmail").textContent = user.email;
+      if (!user) {
+        window.location.href = "login.html";
+      } else {
+        // Display logged-in user's email
+        document.getElementById("userEmail").textContent = user.email;
+      }
     });
   </script>
 </head>
@@ -122,15 +146,19 @@
 <body>
 <div class="container">
 
+  <!-- Back button to home -->
   <button class="back-btn" onclick="location.href='homeuser.html'">← Back</button>
 
+  <!-- Page title -->
   <h1>📊 Your Statistics</h1>
   <p class="tagline">Track your cognitive performance</p>
 
+  <!-- User email display -->
   <div class="user-info">
     <p>Email: <strong id="userEmail">Loading…</strong></p>
   </div>
 
+  <!-- Summary statistics -->
   <div class="stats-grid">
     <div class="stat-card">
       <div class="stat-value" id="totalGames">0</div>
@@ -146,9 +174,11 @@
     </div>
   </div>
 
+  <!-- Per-game breakdown section -->
   <h2 class="section-title">Game Performance</h2>
   <div id="games"></div>
 
+  <!-- Footer -->
   <footer>
     Developed by Dantuluri, A. • Kang, P. • Kang, A. • Nguyen, K. • Rao, D. • Soman, A. • Tsai, A.
     <div>Version 0.1</div>
@@ -158,11 +188,14 @@
 
 <!-- ================= STATS LOGIC ================= -->
 <script type="module">
+
+/* ===== IMPORTS ===== */
 import { auth, db } from "./firebase.js";
 import { collection, getDocs } from
   "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* ===== GAMES CONFIG ===== */
+/* ===== GAMES CONFIGURATION ===== */
+/* Defines each game, its Firestore key, metric extraction logic, and unit */
 const GAMES = [
   {
     name: "Recall Trail",
@@ -196,7 +229,8 @@ const GAMES = [
   }
 ];
 
-/* ===== HELPERS ===== */
+/* ===== HELPER FUNCTION ===== */
+/* Loads all sessions for a specific user and game */
 async function loadGame(uid, gameKey) {
   const snap = await getDocs(
     collection(db, "users", uid, "games", gameKey, "sessions")
@@ -204,7 +238,7 @@ async function loadGame(uid, gameKey) {
   return snap.docs.map(d => d.data());
 }
 
-/* ===== MAIN ===== */
+/* ===== MAIN STATS FUNCTION ===== */
 async function loadStats(uid) {
   let totalGames = 0;
   let streak = 0;
@@ -213,15 +247,20 @@ async function loadStats(uid) {
   const container = document.getElementById("games");
   container.innerHTML = "";
 
+  // Loop through each configured game
   for (const game of GAMES) {
     const sessions = await loadGame(uid, game.key);
 
     totalGames += sessions.length;
     streak = Math.max(streak, sessions.length);
 
+    // Extract metric values
     const values = sessions.map(game.metric).filter(Number);
+
+    // Collect scores for average score calculation
     if (game.unit === "") scorePool.push(...values);
 
+    // Render game stat card dynamically
     container.innerHTML += `
       <div class="game-stat-item">
         <strong>${game.name}</strong>
@@ -249,6 +288,7 @@ async function loadStats(uid) {
     `;
   }
 
+  // Update summary statistics
   document.getElementById("totalGames").textContent = totalGames;
   document.getElementById("bestStreak").textContent = streak;
 
@@ -258,7 +298,8 @@ async function loadStats(uid) {
       : 0;
 }
 
-/* ===== AUTH ===== */
+/* ===== AUTH LISTENER ===== */
+/* Load stats once user is authenticated */
 auth.onAuthStateChanged(user => {
   if (user) loadStats(user.uid);
 });
