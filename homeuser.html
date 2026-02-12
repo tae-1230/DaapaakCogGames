@@ -2,15 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <!-- Ensures proper scaling on mobile devices -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TCare</title>
+
     <style>
+        /* Reset default browser spacing */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        /* Page background styling */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -21,6 +25,7 @@
             padding: 20px;
         }
 
+        /* Main white card container */
         .container {
             background: white;
             border-radius: 20px;
@@ -30,11 +35,13 @@
             width: 100%;
         }
 
+        /* Header section */
         .header {
             text-align: center;
             margin-bottom: 30px;
         }
 
+        /* Top user info bar */
         .user-info {
             background: #f8f9fa;
             padding: 15px 20px;
@@ -45,12 +52,14 @@
             align-items: center;
         }
 
+        /* Container for stats + logout buttons */
         .user-actions {
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
+        /* Stats button styling */
         .stats-btn {
             background: #667eea;
             color: white;
@@ -69,6 +78,7 @@
             background: #5568d3;
         }
 
+        /* Logout button styling */
         .logout-btn {
             background: #9434c5;
             color: white;
@@ -94,18 +104,21 @@
             font-size: 0.9em;
         }
 
+        /* Main title styling */
         h1 {
             color: #333;
             font-size: 2.5em;
             margin-bottom: 10px;
         }
 
+        /* Subtitle under title */
         .tagline {
             color: #666;
             font-size: 1.1em;
             margin-bottom: 30px;
         }
 
+        /* Description box styling */
         .description {
             background: #f0f4ff;
             padding: 20px;
@@ -115,6 +128,7 @@
             line-height: 1.6;
         }
 
+        /* Grid layout for game buttons */
         .games-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -122,6 +136,7 @@
             margin-bottom: 30px;
         }
 
+        /* Individual game button styling */
         .game-button {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -139,6 +154,7 @@
             gap: 10px;
         }
 
+        /* Hover effect for game buttons */
         .game-button:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
@@ -148,10 +164,12 @@
             transform: translateY(-2px);
         }
 
+        /* Emoji icon size */
         .game-icon {
             font-size: 2em;
         }
 
+        /* Footer styling */
         .footer {
             text-align: center;
             color: #999;
@@ -167,6 +185,7 @@
             margin-top: 10px;
         }
 
+        /* Responsive adjustments for small screens */
         @media (max-width: 600px) {
             h1 {
                 font-size: 2em;
@@ -192,39 +211,49 @@
         }
     </style>
 </head>
+
+<!-- Firebase authentication check -->
 <script type="module">
     import { auth } from "./firebase.js";
     import { onAuthStateChanged } from
       "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
   
+    // Redirect to login page if user is not authenticated
     onAuthStateChanged(auth, (user) => {
       if (!user) {
         window.location.href = "login.html";
       }
     });
-  </script>
+</script>
   
 <body>
     <div class="container">
+
+        <!-- User welcome + action buttons -->
         <div class="user-info">
             <div>
                 <h3>👤 Welcome, User</h3>
             </div>
             <div class="user-actions">
+                <!-- Navigate to stats page -->
                 <button class="stats-btn" onclick="location.href='user-stats.html'">
                     📊 Stats
                 </button>
+
+                <!-- Logout (redirect to login page) -->
                 <button class="logout-btn" onclick="location.href='login.html'">
                     Logout
                 </button>
             </div>
         </div>
 
+        <!-- App title and subtitle -->
         <div class="header">
             <h1>TCare</h1>
             <p class="tagline">Cognitive Games to Keep Your Brain Active</p>
         </div>
 
+        <!-- App description -->
         <div class="description">
             <p>
                 Welcome to DAAPAAK Cognitive Games! Choose from five engaging mini-games designed to exercise 
@@ -233,6 +262,7 @@
             </p>
         </div>
 
+        <!-- Game selection buttons -->
         <div class="games-grid">
             <button class="game-button" onclick="location.href='US1Game.html'">
                 <span class="game-icon">👓</span>
@@ -260,12 +290,14 @@
             </button>
         </div>
 
+        <!-- Developer credits -->
         <div class="footer">
             <p>
                 Developed by: Dantuluri, A. • Kang, P. • Kang, A. • Nguyen, K. • Rao, D. • Soman, A. • Tsai, A.
             </p>
             <p class="version">Version 0.1 - Initial Release</p>
         </div>
+
     </div>
 </body>
 </html>
