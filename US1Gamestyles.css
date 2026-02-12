@@ -1,3 +1,5 @@
+/* ================= ROOT VARIABLES ================= */
+/* Centralized color system for easy theme changes */
 :root {
   --bg: #eef4ff;
   --panel: #ffffff;
@@ -9,8 +11,10 @@
   --node-border: #3a5aa6;
 }
 
+/* Reset + consistent box sizing */
 * { box-sizing: border-box; }
 
+/* ================= GLOBAL BODY ================= */
 body {
   margin: 0;
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
@@ -18,8 +22,14 @@ body {
   background: var(--bg);
 }
 
-.app { max-width: 1100px; margin: 0 auto; padding: 18px; }
+/* Main app container */
+.app {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 18px;
+}
 
+/* ================= HEADER ================= */
 .header {
   display: flex;
   align-items: flex-start;
@@ -28,9 +38,18 @@ body {
   margin-bottom: 12px;
 }
 
-h1 { margin: 0; font-size: 22px; }
-.subtitle { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
+h1 {
+  margin: 0;
+  font-size: 22px;
+}
 
+.subtitle {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* ================= HUD (Timer + Errors) ================= */
 .hud {
   display: grid;
   grid-auto-flow: column;
@@ -45,9 +64,18 @@ h1 { margin: 0; font-size: 22px; }
   min-width: 110px;
 }
 
-.label { display: block; font-size: 11px; color: var(--muted); }
-.hud-item span:last-child { font-weight: 700; font-size: 16px; }
+.label {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+}
 
+.hud-item span:last-child {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+/* ================= CONTROLS SECTION ================= */
 .controls {
   display: flex;
   flex-wrap: wrap;
@@ -60,9 +88,16 @@ h1 { margin: 0; font-size: 22px; }
   margin-bottom: 12px;
 }
 
-.controls label { display: grid; gap: 6px; font-size: 12px; color: var(--muted); }
+.controls label {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
 
-.controls select, .controls input {
+/* Dropdown + input styling */
+.controls select,
+.controls input {
   padding: 8px 10px;
   border-radius: 10px;
   border: 1px solid rgba(11,27,51,0.18);
@@ -71,8 +106,13 @@ h1 { margin: 0; font-size: 22px; }
   min-width: 220px;
 }
 
-.controls input { min-width: 120px; width: 120px; }
+/* Memorize time input smaller width */
+.controls input {
+  min-width: 120px;
+  width: 120px;
+}
 
+/* ================= BUTTONS ================= */
 button {
   padding: 10px 14px;
   border-radius: 12px;
@@ -83,16 +123,19 @@ button {
   cursor: pointer;
 }
 
+/* Disabled button appearance */
 button:disabled {
   opacity: 0.55;
   cursor: not-allowed;
 }
 
+/* Secondary button style */
 button.secondary {
   background: white;
   color: var(--ink);
 }
 
+/* ================= GAME BOARD ================= */
 .board-wrap {
   background: var(--panel);
   border: 1px solid rgba(11,27,51,0.12);
@@ -105,12 +148,28 @@ button.secondary {
   width: 100%;
   height: 560px;
   border-radius: 12px;
+
+  /* Subtle grid background */
   background:
-    repeating-linear-gradient(0deg, rgba(11,27,51,0.03), rgba(11,27,51,0.03) 1px, transparent 1px, transparent 28px),
-    repeating-linear-gradient(90deg, rgba(11,27,51,0.03), rgba(11,27,51,0.03) 1px, transparent 1px, transparent 28px);
+    repeating-linear-gradient(
+      0deg,
+      rgba(11,27,51,0.03),
+      rgba(11,27,51,0.03) 1px,
+      transparent 1px,
+      transparent 28px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(11,27,51,0.03),
+      rgba(11,27,51,0.03) 1px,
+      transparent 1px,
+      transparent 28px
+    );
+
   overflow: hidden;
 }
 
+/* ================= NODE (Clickable Circles) ================= */
 .node {
   position: absolute;
   width: 70px;
@@ -118,28 +177,41 @@ button.secondary {
   border-radius: 999px;
   background: var(--node);
   border: 3px solid var(--node-border);
+
   display: grid;
   place-items: center;
+
   font-weight: 800;
   font-size: 22px;
+
   user-select: none;
   cursor: pointer;
-  transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+
+  transition:
+    transform 120ms ease,
+    background 120ms ease,
+    border-color 120ms ease;
 }
 
-.node:hover { transform: scale(1.04); }
+/* Slight scale effect on hover */
+.node:hover {
+  transform: scale(1.04);
+}
 
+/* Correct selection feedback */
 .node.correct {
   background: rgba(42,157,143,0.18);
   border-color: var(--good);
 }
 
+/* Wrong selection feedback */
 .node.wrong {
   background: rgba(231,111,81,0.22);
   border-color: var(--bad);
   animation: shake 240ms ease;
 }
 
+/* Shake animation for incorrect taps */
 @keyframes shake {
   0% { transform: translateX(0); }
   25% { transform: translateX(-4px); }
@@ -148,12 +220,24 @@ button.secondary {
   100% { transform: translateX(0); }
 }
 
-.footer { margin-top: 10px; }
-.status { color: var(--muted); font-size: 14px; }
+/* ================= FOOTER STATUS ================= */
+.footer {
+  margin-top: 10px;
+}
 
-/* Modal */
-.modal.hidden { display: none; }
+.status {
+  color: var(--muted);
+  font-size: 14px;
+}
 
+/* ================= MODAL (Sequence Display) ================= */
+
+/* Hidden state */
+.modal.hidden {
+  display: none;
+}
+
+/* Modal overlay */
 .modal {
   position: fixed;
   inset: 0;
@@ -164,6 +248,7 @@ button.secondary {
   padding: 16px;
 }
 
+/* Modal card container */
 .modal-card {
   width: min(520px, 100%);
   background: white;
@@ -177,6 +262,7 @@ button.secondary {
   font-size: 18px;
 }
 
+/* Displayed sequence styling */
 .sequence-text {
   font-size: 20px;
   font-weight: 800;
@@ -191,6 +277,7 @@ button.secondary {
   word-break: break-word;
 }
 
+/* Modal bottom row (countdown + button) */
 .modal-row {
   display: flex;
   align-items: center;
@@ -198,4 +285,8 @@ button.secondary {
   gap: 10px;
 }
 
-.small { color: var(--muted); font-size: 12px; }
+/* Small muted text */
+.small {
+  color: var(--muted);
+  font-size: 12px;
+}
