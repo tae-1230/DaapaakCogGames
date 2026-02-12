@@ -1,3 +1,4 @@
+<!-- By Alex Soman -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -118,6 +119,7 @@ let moves = 0;
 let timerId = null;
 
 /* ================= HUD ================= */
+/* updates the HUD */
 function updateHUD() {
   document.getElementById("hudGrid").textContent = `${GRID_SIZE}×${GRID_SIZE}`;
   document.getElementById("hudPairs").textContent = PAIRS;
@@ -125,10 +127,12 @@ function updateHUD() {
 }
 
 /* ================= HELPERS ================= */
+/* checks if mouse is on grid */
 const inside = (x, y) => x >= 0 && y >= 0 && x < GRID_SIZE && y < GRID_SIZE;
+/* checks if 2 tiles are neighbors */
 const neighbors = (a, b) =>
   Math.abs(a.x - b.x) + Math.abs(a.y - b.y) === 1;
-
+/* finds the cell mouse is in */
 function cellFromMouse(e) {
   return {
     x: Math.floor(e.offsetX / CELL),
@@ -137,6 +141,7 @@ function cellFromMouse(e) {
 }
 
 /* ================= LEVEL ================= */
+/* generates the level by generating paths rather than pairs of dots */
 function generateLevel() {
   canvas.width = GRID_SIZE * CELL;
   canvas.height = GRID_SIZE * CELL;
@@ -166,7 +171,7 @@ function generateLevel() {
     dots.push({ ...path[path.length - 1], id });
   }
 }
-
+/* generates path */
 function generatePath() {
   const start = randomEmptyCell();
   if (!start) return null;
@@ -193,7 +198,7 @@ function generatePath() {
 
   return path.length >= 3 ? path : null;
 }
-
+/* finds an empty cell to start a path*/
 function randomEmptyCell() {
   const cells = [];
   for (let y = 0; y < GRID_SIZE; y++) {
@@ -205,6 +210,7 @@ function randomEmptyCell() {
 }
 
 /* ================= DRAW ================= */
+/* draws grid */  
 function drawGrid() {
   ctx.strokeStyle = "#333";
   for (let i = 0; i <= GRID_SIZE; i++) {
@@ -219,7 +225,7 @@ function drawGrid() {
     ctx.stroke();
   }
 }
-
+/* draws path */
 function drawPath(cells, color) {
   ctx.strokeStyle = color;
   ctx.lineWidth = CELL / 3;
@@ -231,7 +237,7 @@ function drawPath(cells, color) {
   }
   ctx.stroke();
 }
-
+/* draw dots */
 function drawDots() {
   for (const d of dots) {
     ctx.fillStyle = COLORS[d.id];
@@ -246,7 +252,7 @@ function drawDots() {
     ctx.fill();
   }
 }
-
+/* displays win screen */
 function drawWin() {
   ctx.fillStyle = "rgba(0,0,0,0.6)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -305,6 +311,7 @@ canvas.addEventListener("mousemove", e => {
 canvas.addEventListener("mouseup", () => drawing = null);
 
 /* ================= WIN ================= */
+/* checks for win */
 function checkWin() {
   for (let id = 0; id < PAIRS; id++) {
     if (!paths[id]) return;
@@ -338,7 +345,7 @@ document.getElementById("gridSize").onchange = e => {
   populatePairs();
   generateLevel();
 };
-
+/* function that decides max amount of pairs per size of grid */
 function populatePairs() {
   const maxPairs = Math.floor((GRID_SIZE * GRID_SIZE) / 6);
   const select = document.getElementById("pairCount");
@@ -361,6 +368,7 @@ document.getElementById("pairCount").onchange = e => {
 };
 
 /* ================= LOOP ================= */
+/* game loop that updates the grid for every event */  
 function loop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawGrid();
