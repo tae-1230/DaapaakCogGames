@@ -3,9 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <title>TCare - Sign Up</title>
+
+  <!-- Ensures proper scaling on mobile devices -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
+    /* Page background styling */
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -15,6 +18,7 @@
       align-items: center;
     }
 
+    /* Main white signup card */
     .container {
       background: white;
       padding: 40px;
@@ -24,18 +28,21 @@
       box-shadow: 0 20px 60px rgba(0,0,0,0.3);
     }
 
+    /* Page title */
     h1 {
       text-align: center;
       margin-bottom: 20px;
       color: #333;
     }
 
+    /* Label styling */
     label {
       display: block;
       margin-top: 15px;
       color: #333;
     }
 
+    /* Input field styling */
     input {
       width: 100%;
       padding: 12px;
@@ -45,6 +52,7 @@
       font-size: 1em;
     }
 
+    /* Sign up button styling */
     button {
       width: 100%;
       margin-top: 25px;
@@ -57,6 +65,7 @@
       cursor: pointer;
     }
 
+    /* Back to login link section */
     .back {
       margin-top: 15px;
       text-align: center;
@@ -71,49 +80,67 @@
 
 <body>
   <div class="container">
+
+    <!-- Page heading -->
     <h1>Create Account</h1>
 
+    <!-- Email input -->
     <label>Email</label>
     <input type="email" id="email">
 
+    <!-- Password input -->
     <label>Password</label>
     <input type="password" id="password">
 
+    <!-- Sign up button -->
     <button id="signupBtn">Sign Up</button>
 
+    <!-- Back to login link -->
     <div class="back">
       <a href="login.html">← Back to Login</a>
     </div>
+
   </div>
 
-  <!-- SIGN UP LOGIC -->
+  <!-- SIGN UP LOGIC (Firebase Authentication) -->
   <script type="module">
     import { auth } from "./firebase.js";
     import {
       createUserWithEmailAndPassword
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
+    // Get the Sign Up button
     const signupBtn = document.getElementById("signupBtn");
 
+    // Add click event listener to button
     signupBtn.addEventListener("click", async () => {
+
+      // Get input values
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
 
+      // Basic validation: check for empty fields
       if (!email || !password) {
         alert("Please enter email and password");
         return;
       }
 
+      // Enforce minimum password length (Firebase requires 6+)
       if (password.length < 6) {
         alert("Password must be at least 6 characters");
         return;
       }
 
       try {
+        // Create new user account with Firebase
         await createUserWithEmailAndPassword(auth, email, password);
+
         alert("Account created!");
+
+        // Redirect to home page after successful signup
         window.location.href = "homeuser.html";
       } catch (error) {
+        // Show error if signup fails
         alert(error.message);
       }
     });
