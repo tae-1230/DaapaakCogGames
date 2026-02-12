@@ -138,14 +138,18 @@ const sceneTemplates = [
 ];
 
 // functions
+
+//show status message
 function setStatus(msg) {
   statusEl.textContent = msg;
 }
 
+//show phase of game (memorizing, guessing, etc)
 function setPhase(msg) {
   phaseEl.innerHTML = msg;
 }
 
+//save events like clicks, etc
 function logEvent(type, data) {
   if (!liveSession) return;
   liveSession.events.push({
@@ -155,6 +159,7 @@ function logEvent(type, data) {
   });
 }
 
+//update screen numbers
 function updateHUD() {
   roundEl.textContent = gameState.round || "—";
   itemsEl.textContent = gameState.difficulty;
@@ -162,11 +167,13 @@ function updateHUD() {
   streakEl.textContent = gameState.streak;
 }
 
+//display numbers after user answers
 function showFeedback(msg, type) {
   feedbackEl.textContent = msg;
   feedbackEl.className = "feedback " + type;
 }
 
+//stats like accuracy and time
 function computeMetrics(sess) {
   if (!sess) return null;
 
@@ -206,7 +213,7 @@ function computeMetrics(sess) {
     final_difficulty: sess.final_difficulty
   };
 }
-
+//download text file
 function downloadText(filename, text, mime) {
   const blob = new Blob([text], { type: mime || "text/plain" });
   const url = URL.createObjectURL(blob);
@@ -219,6 +226,7 @@ function downloadText(filename, text, mime) {
   setTimeout(() => URL.revokeObjectURL(url), 2500);
 }
 
+//export game log as json
 function exportReport() {
   if (!session) {
     setStatus("No finished run yet — finish a game first.");
@@ -248,6 +256,8 @@ function exportReport() {
 }
 
 // scene funcs
+
+//create random scene from templates
 function generateScene() {
   const template = sceneTemplates[Math.floor(Math.random() * sceneTemplates.length)];
 
@@ -275,6 +285,7 @@ function generateScene() {
   renderScene(gameState.currentScene, false);
 }
 
+//draws scene
 function renderScene(items, clickable) {
   scene.innerHTML = "";
   items.forEach(item => {
@@ -291,6 +302,8 @@ function renderScene(items, clickable) {
 }
 
 //game flow
+
+//start new game
 function startGame() {
   resetGame(false);
 
@@ -319,6 +332,7 @@ function startGame() {
   nextRound();
 }
 
+//starts new round
 function nextRound() {
   if (gameState.round >= gameState.maxRounds) {
     finishGame();
@@ -362,6 +376,7 @@ function nextRound() {
   }, 1000);
 }
 
+//black screen between memorizing and guessing
 function startBlackScreen() {
   state = "blackscreen";
   logEvent("black_screen");
@@ -378,6 +393,7 @@ function startBlackScreen() {
   }, 1500);
 }
 
+//removes item and lets player guess missing
 function startRecallPhase() {
   state = "active";
 
@@ -410,12 +426,13 @@ function startRecallPhase() {
     if (dist < 12) checkAnswer(gameState.removedItem.id, e);
   };
 }
-
+//runs when player clicks item
 function onItemClick(id, event) {
   if (state !== "active") return;
   checkAnswer(id, event);
 }
 
+//checks answer with initial screen
 function checkAnswer(selectedId, event) {
   if (state !== "active") return;
 
@@ -479,6 +496,7 @@ function checkAnswer(selectedId, event) {
   ">${isLast ? "See Results" : "Next Round →"}</button>`);
 }
 
+//ends game and show results
 function finishGame() {
   state = "done";
 
@@ -515,6 +533,7 @@ function finishGame() {
   console.log("SESSION_RESULT", session);
 }
 
+//end game early if player presses end game
 function endGame() {
   if (state === "idle" || state === "done") return;
 
